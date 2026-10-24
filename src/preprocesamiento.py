@@ -20,7 +20,8 @@ def limpiar(df):
     df["pdays"] = df["pdays"].replace(-1,np.nan)
     df["n_creditos"] = (df["housing"] == "yes").astype(int) + (df["loan"] == "yes").astype(int)
     df["en_sobregiro"] = [1 if x < 0 else 0 for x in df["balance"]]
-    df.drop(columns=["duration","y","housing","loan"],inplace=True)
+    df["rango"] = pd.cut(df["age"], bins=[ 0,30, 50, 100], labels=["<=30", "31-50", ">50"])
+    df.drop(columns=["duration","y","housing","loan", "age"],inplace=True)
     return df
 
 
