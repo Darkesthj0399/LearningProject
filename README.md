@@ -25,3 +25,25 @@ Repaso del flujo completo de un modelo de clasificación con el dataset UCI Bank
 - Random Forest y boosting.
 - Elegir el umbral con el costo de una llamada y lo que deja un cliente que contrata.
 - Evaluar en test una sola vez, con el modelo final.
+
+
+
+## Umbral → tabla de campaña
+**Para qué:** traducir el modelo en opciones de negocio (cuántos llamar, cuántas ventas).
+```python
+for umbral in [0.5, 0.4, 0.3, 0.2, 0.1]:
+    p = (proba >= umbral).astype(int)   # 1 = lo llamo, 0 = no lo llamo
+    print(f"umbral {umbral}: llamadas={p.sum()} ventas={(p * y).sum()}")
+```
+- `p.sum()` = llamadas. `(p * y).sum()` = ventas (1 solo si lo llamé Y compró).
+- **Ojo con:** si las llamadas extra de un salto rinden como el % de positivos (azar), ese umbral ya no aporta.
+- Al negocio se le da en proporciones: "llamando al 15% de la base capturamos el 54% de los compradores".
+
+## CV vs test
+- **CV (dentro de train):** para elegir modelo e hiperparámetros. Cada fold se evalúa con clientes que ese modelo no vio.
+- **Test:** prueba final, una sola vez. Después no se ajusta nada.
+- **Sobreajuste:** modelo final prediciendo sobre su propio train (nota inflada) vs CV (nota honesta). Si la inflada está muy arriba, memorizó.
+```python
+pipe.fit(X_train, y_train)                    # modelo final, con todo train
+proba_test = pipe.predict_proba(X_test)[:, 1] # el pipeline solo aplica (transform) en test
+```
