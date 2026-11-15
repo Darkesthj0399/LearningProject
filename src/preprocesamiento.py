@@ -14,15 +14,17 @@ def cargar(ruta):
 
 def limpiar(df):
     df = df.copy()
-    df['aceptacion'] = df['y'].replace(['no','yes'],['0','1'])
-    df['aceptacion']=df['aceptacion'].astype(int)
+    if 'y' in df.columns:
+        df['aceptacion'] = df['y'].replace(['no','yes'],['0','1'])
+        df['aceptacion']=df['aceptacion'].astype(int)
     df['contactado_antes'] = [1 if x != -1 else 0 for x in df["pdays"]]
     df["pdays"] = df["pdays"].replace(-1,np.nan)
     df["n_creditos"] = (df["housing"] == "yes").astype(int) + (df["loan"] == "yes").astype(int)
     df["en_sobregiro"] = [1 if x < 0 else 0 for x in df["balance"]]
     df["rango"] = pd.cut(df["age"], bins=[ 0,30, 50, 100], labels=["<=30", "31-50", ">50"])
-    df.drop(columns=["duration","y","housing","loan", "age"],inplace=True)
+    df.drop(columns=["duration","y","housing","loan", "age"],inplace=True,errors='ignore')
     return df
+  
 
 
 
